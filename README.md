@@ -21,6 +21,7 @@ Dataset used: Breast Cancer Wisconsin (Diagnostic) dataset
 - Target classes: 0 = malignant, 1 = benign
 - Feature type: Real-valued measurements (mean radius, texture, smoothness, etc.)
 - Reason for selection: the dataset is widely used for classification benchmarking and satisfies the assignment requirement of at least 12 features and 500 instances.
+- The 569-record `test_data.csv` includes a `split` column. The app evaluates only the 114 held-out `test` records; the remaining records were used to train the saved models.
 
 ## c. GitHub Repository Link
 https://github.com/avighanwat/ML-Assignment
@@ -73,6 +74,7 @@ streamlit run app.py
 
 The application allows:
 - CSV upload of test data,
+- evaluation of only the held-out rows when the CSV includes a `split` column,
 - model selection dropdown,
 - display of evaluation metrics,
 - confusion matrix visualization,

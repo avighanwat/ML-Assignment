@@ -93,15 +93,38 @@ if "target" not in df.columns:
     st.stop()
 
 if not feature_names:
-    feature_names = [col for col in df.columns if col != "target"]
+    feature_names = [col for col in df.columns if col not in {"target", "split"}]
 
 missing = [col for col in feature_names if col not in df.columns]
 if missing:
     st.error(f"Missing required feature columns: {missing}")
     st.stop()
 
-X = df[feature_names]
-y_true = df["target"]
+if "split" in df.columns:
+    if df["split"].isna().any() or not df["split"].isin(["train", "test"]).all():
+        st.error("The optional 'split' column must contain only 'train' or 'test'.")
+        st.stop()
+    evaluation_df = df.loc[df["split"] == "test"]
+    if evaluation_df.empty:
+        st.error("The dataset's 'split' column must include at least one 'test' row.")
+        st.stop()
+    st.info(
+        f"Evaluating {len(evaluation_df)} held-out test records "
+        f"from the {len(df)}-record dataset."
+    )
+else:
+    evaluation_df = df
+    st.info(
+        f"Evaluating all {len(evaluation_df)} uploaded records. "
+        "Upload test-only data that was not used to train the saved models."
+    )
+
+X = evaluation_df[feature_names]
+y_true = evaluation_df["target"]
+if y_true.nunique() < 2:
+    st.error("The evaluation data must contain at least two target classes to calculate AUC.")
+    st.stop()
+
 selected_model = st.selectbox("Select a model to evaluate", model_names)
 model = load_model(selected_model)
 y_pred = model.predict(X)
