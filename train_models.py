@@ -84,11 +84,9 @@ def main():
     feature_names = list(X.columns)
     (MODEL_DIR / "feature_names.json").write_text(json.dumps(feature_names), encoding="utf-8")
 
-    dataset_df = X.copy()
-    dataset_df["target"] = y
-    dataset_df["split"] = "train"
-    dataset_df.loc[X_test.index, "split"] = "test"
-    dataset_df.to_csv("test_data.csv", index=False)
+    test_df = X_test.copy()
+    test_df["target"] = y_test
+    test_df.to_csv("test_data.csv", index=False)
 
     summary_rows = []
     for model_name, model in build_models().items():
